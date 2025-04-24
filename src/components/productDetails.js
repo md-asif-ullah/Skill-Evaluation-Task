@@ -16,7 +16,7 @@ const ProductDetails = ({ product }) => {
         <div>
           <div className="w-full lg:h-[500px] xl:h-[550px] rounded-lg overflow-hidden border">
             <Image
-              src={`https://admin.refabry.com/storage/product/${image}`}
+              src={`https://admin.refabry.com/storage/product/${selectedImage}`}
               alt={name}
               width={1000}
               height={600}
@@ -42,7 +42,7 @@ const ProductDetails = ({ product }) => {
                   alt={`${name} thumbnail`}
                   width={80}
                   height={80}
-                  className="w-full h-full object-cover"
+                  className="w-full h-full object-cover cursor-pointer"
                 />
               </button>
             ))}
