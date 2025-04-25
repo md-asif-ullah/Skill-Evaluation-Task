@@ -2,15 +2,49 @@
 
 import { useState } from "react";
 import Image from "next/image";
+import { useCartItemsState } from "@/app/utils/cartItemsProvider";
 
 const ProductDetails = ({ product }) => {
-  const { name, image, price, short_desc, product_images, discount_amount } =
-    product[0];
+  const {
+    name,
+    image,
+    price,
+    short_desc,
+    product_images,
+    discount_amount,
+    unique_id,
+  } = product[0];
 
   const [selectedImage, setSelectedImage] = useState(image);
+  const [quantity, setQuantity] = useState(1);
+  const { cartItems, setCartItems } = useCartItemsState();
+
+  const handleAddToCart = () => {
+    const existingItem = cartItems.find((item) => item.id === unique_id);
+
+    if (existingItem) {
+      setCartItems((prev) =>
+        prev.map((item) =>
+          item.id === unique_id ? { ...item, quantity: quantity } : item
+        )
+      );
+      return;
+    }
+
+    setCartItems((prev) => [
+      ...prev,
+      {
+        id: unique_id,
+        quantity,
+      },
+    ]);
+  };
+
+  const handleIncrease = () => setQuantity((prev) => prev + 1);
+  const handleDecrease = () => setQuantity((prev) => (prev > 1 ? prev - 1 : 1));
 
   return (
-    <div className="px-4 md:px-8 py-6 lg:px-10 xl:px-40">
+    <div className="px-4 md:px-8 py-14 lg:px-10 xl:px-40">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-10 lg:gap-20">
         {/* Image Section */}
         <div>
@@ -56,14 +90,14 @@ const ProductDetails = ({ product }) => {
               {name}
             </h1>
 
-            <div className="flex items-center gap-4 mb-6">
+            <div className="flex items-center gap-4 mb-3">
               <p className="text-2xl font-semibold text-[#f85606]">
                 ৳{price - Number(discount_amount)}
               </p>
               <del className="text-gray-500 text-lg">${price}</del>
             </div>
 
-            <div className="border-t-2 border-dashed pt-5 border-gray-200">
+            <div className="border-t-3 pt-2 border-gray-300">
               <h2 className="text-lg font-semibold text-gray-700 mb-2">
                 Description:
               </h2>
@@ -71,16 +105,34 @@ const ProductDetails = ({ product }) => {
                 {short_desc}
               </p>
             </div>
+
+            {/* Quantity Selector */}
+            <div className="mt-4 flex items-center gap-4">
+              <span className="font-medium">Quantity:</span>
+              <div className="flex items-center">
+                <button
+                  onClick={handleDecrease}
+                  className="w-10 h-10 text-lg font-bold hover:bg-gray-200"
+                >
+                  -
+                </button>
+                <span className="w-10 text-center">{quantity}</span>
+                <button
+                  onClick={handleIncrease}
+                  className="w-10 h-10 text-lg font-bold hover:bg-gray-200"
+                >
+                  +
+                </button>
+              </div>
+            </div>
           </div>
 
-          <div className="flex flex-col md:flex-row gap-4 mt-10">
-            <button className="grow py-3 px-6 bg-orange-500 hover:bg-orange-700 rounded-md text-white cursor-pointer duration-500">
-              Add To Cart
-            </button>
-            <button className="grow py-3 px-6 border border-gray-400 text-gray-600 rounded-md cursor-pointer">
-              Checkout Now
-            </button>
-          </div>
+          <button
+            onClick={handleAddToCart}
+            className="py-3 px-3 bg-orange-500 hover:bg-orange-700 rounded-md text-white cursor-pointer duration-500"
+          >
+            Add To Cart
+          </button>
         </div>
       </div>
     </div>
