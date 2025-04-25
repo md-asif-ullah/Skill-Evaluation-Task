@@ -1,7 +1,7 @@
 export default async function ProductsData() {
   try {
     const data = await fetch("https://admin.refabry.com/api/all/product/get", {
-      cache: "no-store",
+      next: { revalidate: 60 },
     });
     const products = await data.json();
     return products;

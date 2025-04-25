@@ -14,13 +14,15 @@ const Navbar = () => {
       </Link>
 
       <div className="relative flex items-center gap-2">
-        <button className="relative text-2xl cursor-pointer">
-          <FiShoppingCart />
+        <Link href="/cart">
+          <button className="relative text-2xl cursor-pointer">
+            <FiShoppingCart />
 
-          <span className="absolute -top-2 -right-2 bg-red-500 text-white text-[10px] font-semibold rounded-full w-5 h-5 flex items-center justify-center">
-            {cartItems.length || 0}
-          </span>
-        </button>
+            <span className="absolute -top-2 -right-2 bg-red-500 text-white text-[10px] font-semibold rounded-full w-5 h-5 flex items-center justify-center">
+              {cartItems.length || 0}
+            </span>
+          </button>
+        </Link>
       </div>
     </nav>
   );
