@@ -48,13 +48,13 @@ const ProductDetails = ({ product }) => {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-10 lg:gap-20">
         {/* Image Section */}
         <div>
-          <div className="w-full lg:h-[500px] xl:h-[550px] rounded-lg overflow-hidden border">
+          <div className="w-full lg:h-[500px] xl:h-[550px] rounded-lg overflow-hidden border border-neutral-400">
             <Image
               src={`https://admin.refabry.com/storage/product/${selectedImage}`}
               alt={name}
               width={1000}
               height={600}
-              priority
+              loading="lazy"
               className="w-full h-auto"
             />
           </div>
@@ -67,7 +67,7 @@ const ProductDetails = ({ product }) => {
                 onClick={() => setSelectedImage(imgData.name)}
                 className={`flex-shrink-0 w-20 h-20 rounded-md overflow-hidden border ${
                   selectedImage === imgData.name
-                    ? "border-black"
+                    ? "border-neutral-400"
                     : "border-transparent"
                 }`}
               >
@@ -76,6 +76,7 @@ const ProductDetails = ({ product }) => {
                   alt={`${name} thumbnail`}
                   width={80}
                   height={80}
+                  loading="lazy"
                   className="w-full h-full object-cover cursor-pointer"
                 />
               </button>
