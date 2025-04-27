@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Image from "next/image";
 import { useCartItemsState } from "@/app/utils/cartItemsProvider";
+import Discount_date from "@/app/utils/discount_date";
 
 const ProductDetails = ({ product }) => {
   const {
@@ -18,6 +19,8 @@ const ProductDetails = ({ product }) => {
   const [selectedImage, setSelectedImage] = useState(image);
   const [quantity, setQuantity] = useState(1);
   const { cartItems, setCartItems } = useCartItemsState();
+
+  const dicountOffer = Discount_date(product[0]);
 
   const handleAddToCart = () => {
     const existingItem = cartItems.find((item) => item.id === unique_id);
@@ -91,11 +94,16 @@ const ProductDetails = ({ product }) => {
               {name}
             </h1>
 
-            <div className="flex items-center gap-4 mb-3">
-              <p className="text-2xl font-semibold text-[#f85606]">
-                ৳{price - Number(discount_amount)}
+            <div className="flex items-center gap-[10px]">
+              <p className="text-xl font-semibold mt-1 text-[#f85606] flex items-center">
+                <span className="text-xl">৳</span>
+                {dicountOffer ? price - Number(discount_amount) : price}
               </p>
-              <del className="text-gray-500 text-lg">${price}</del>
+              {dicountOffer && (
+                <del className="text-[1rem] font-normal mt-1 text-gray-500 ">
+                  ${price}
+                </del>
+              )}
             </div>
 
             <div className="border-t-3 pt-2 border-gray-300">
