@@ -1,2 +1,9 @@
 @import "tailwindcss";
 
+.labelStyles {
+  @apply text-[14px] font-[400] text-gray-700;
+}
+
+.inputStyles {
+  @apply border border-gray-200 w-full py-2 px-4 rounded-md mt-1 outline-none focus:border-[#ff6900];
+}

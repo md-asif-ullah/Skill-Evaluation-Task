@@ -1,7 +1,14 @@
-import Link from "next/link";
+"use client";
 
-function SubCard({ filteredProducts }) {
-  console.log("SubCard filteredProducts", filteredProducts);
+import { useCartItemsState } from "@/app/utils/cartItemsProvider";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+
+function SubCard({ filteredProducts, text, formData, title }) {
+  const router = useRouter();
+  const { cartItems, setCartItems } = useCartItemsState(); // Get cart items from context
+
+  // Calculate subtotal, total discount, tax, and total
 
   let subTotal = 0;
   let totalDiscount = 0;
@@ -13,7 +20,6 @@ function SubCard({ filteredProducts }) {
       const itemSubtotal = itemPrice * itemQuantity;
 
       subTotal += itemSubtotal;
-      console.log(item.discount_amount, itemQuantity, itemPrice, itemSubtotal);
 
       if (item.discount_amount) {
         totalDiscount += parseFloat(item.discount_amount) * itemQuantity;
@@ -21,15 +27,67 @@ function SubCard({ filteredProducts }) {
     }
   }
 
-  console.log(subTotal, totalDiscount);
-
   const taxRate = 0.08; // 8% tax
   const tax = (subTotal - totalDiscount) * taxRate;
   const total = subTotal - totalDiscount + tax;
 
+  // Prepare product_ids and s_product_qty for the order
+
+  let product_ids = "";
+  let s_product_qty = "";
+
+  if (cartItems && cartItems.length > 0) {
+    for (const item of cartItems) {
+      product_ids += item.id + ",";
+      s_product_qty += item.quantity + ",";
+    }
+  }
+
+  const handleOrder = async () => {
+    const newOrderData = {
+      product_ids,
+      s_product_qty,
+      c_phone: formData.phone,
+      c_name: formData.firstName + " " + formData.lastName,
+      courier: formData.delivery_service,
+      address: formData.address,
+      advance: null,
+      cod_amount: subTotal,
+      discount_amount: totalDiscount,
+      delivery_charge: 0,
+    };
+
+    try {
+      const res = await fetch(
+        "https://admin.refabry.com/api/public/order/create",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(newOrderData),
+        }
+      );
+
+      const data = await res.json();
+
+      if (data.error) {
+        alert(data.error.c_phone[0]);
+      }
+
+      if (data.status) {
+        router.push("/");
+        setCartItems([]);
+        alert("Order placed successfully");
+      }
+    } catch (error) {
+      alert("Something went wrong");
+    }
+  };
+
   return (
     <div className="border border-slate-200 w-full h-[400px] p-6 rounded-2xl shadow-sm bg-white lg:min-h-[340px]">
-      <h2 className="text-2xl font-bold text-slate-900 mb-6">Cart Summary</h2>
+      <h2 className="text-2xl font-bold text-slate-900 mb-6">{title}</h2>
 
       <div className="space-y-4">
         <div className="flex justify-between text-slate-700">
@@ -62,11 +120,21 @@ function SubCard({ filteredProducts }) {
         </div>
       </div>
 
-      <Link href="/payment-info" className="block">
-        <button className="w-full mt-6 py-4 text-white bg-orange-500 hover:bg-orange-600 rounded-xl text-lg font-medium transition">
-          Proceed to Checkout
+      {text ? (
+        <button
+          onClick={handleOrder}
+          type="button"
+          className="w-full mt-6 py-4 text-white bg-orange-500 hover:bg-orange-600 rounded-xl text-lg font-medium transition"
+        >
+          {text}
         </button>
-      </Link>
+      ) : (
+        <Link href="/checkout" className="block">
+          <button className="w-full mt-6 py-4 text-white bg-orange-500 hover:bg-orange-600 rounded-xl text-lg font-medium transition">
+            Proceed to Checkout
+          </button>
+        </Link>
+      )}
     </div>
   );
 }
