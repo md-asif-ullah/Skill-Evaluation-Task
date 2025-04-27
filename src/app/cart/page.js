@@ -1,54 +1,18 @@
 "use client";
 
 import Link from "next/link";
-import { useCartItemsState } from "../utils/cartItemsProvider";
 import NotFound from "@/components/notFound";
-import { useEffect, useState } from "react";
 import CartTableBody from "@/components/CartTableBody";
 import SubCard from "@/components/subCart";
+import Loading from "../loading";
+import useCartFilteredProducts from "@/components/useCartFilteredProducts";
 
 function Cart() {
-  const [data, setData] = useState();
-  const [isError, setIsError] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
-  const { cartItems } = useCartItemsState();
+  const { filteredProducts, isLoading } = useCartFilteredProducts();
 
-  if (!cartItems) {
-    NotFound({ text: "No items in cart" });
+  if (isLoading) {
+    return <Loading />;
   }
-
-  useEffect(() => {
-    const fetchData = async () => {
-      setIsLoading(true);
-      try {
-        const res = await fetch(
-          "https://admin.refabry.com/api/all/product/get"
-        );
-        const products = await res.json();
-        setData(products?.data?.data || []);
-      } catch (error) {
-        setIsError(true);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchData();
-  }, []);
-
-  const filteredProducts = data
-    ?.filter((product) =>
-      cartItems.some((item) => item.id === product.unique_id)
-    )
-    .map((product) => {
-      const matchedCartItem = cartItems.find(
-        (item) => item.id === product.unique_id
-      );
-      return {
-        ...product,
-        quantity: matchedCartItem?.quantity || 1,
-      };
-    });
 
   if (!filteredProducts) {
     return <NotFound text="Product not found" />;
@@ -84,7 +48,7 @@ function Cart() {
             </Link>
           </div>
         </div>
-        <SubCard filteredProducts={filteredProducts} />
+        <SubCard filteredProducts={filteredProducts} title="Cart Summary" />
       </div>
     </div>
   );
