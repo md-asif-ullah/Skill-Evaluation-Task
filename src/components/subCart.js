@@ -44,6 +44,11 @@ function SubCard({ filteredProducts, text, formData, title }) {
   }
 
   const handleOrder = async () => {
+    if (cartItems.length === 0) {
+      alert("Please add products to cart");
+      return;
+    }
+
     const newOrderData = {
       product_ids,
       s_product_qty,
